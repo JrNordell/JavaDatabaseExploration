@@ -30,6 +30,7 @@ public class Author {
 
         boolean isDone = false;
         int i = 0;
+        book.setAuthor(this);
 
         if(bookList.size() != 0){
 

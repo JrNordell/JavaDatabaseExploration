@@ -81,7 +81,7 @@ public class Book {
 
     public boolean equals(Object object){
         Book book = (Book)object;
-        return (this.bookCode.equals(book.bookCode));
+        return (this.bookCode.equals(book.bookCode) && author.equals(book.author));
     }
 
     public String toString(){

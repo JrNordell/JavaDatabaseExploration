@@ -140,8 +140,8 @@ public class HenryDAO {
 
             while(resultSet.next()){
 
-                String authorFirst = resultSet.getString("author_first");
-                String authorLast = resultSet.getString("author_last");
+                String authorFirst = resultSet.getString("author_first").trim();
+                String authorLast = resultSet.getString("author_last").trim();
 
                 Author author = new Author(authorFirst, authorLast);
 
@@ -154,6 +154,7 @@ public class HenryDAO {
                 Book book = new Book(bookCode,title,price,location,onHand);
 
                 author.addBook(book);
+
 
                 boolean isDone = false;
                 int i = 0;
