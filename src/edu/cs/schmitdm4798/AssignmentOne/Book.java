@@ -17,6 +17,7 @@ public class Book {
     private Float price;
     private boolean paperback;
     private List<Location> location;
+    private Author author;
 
     public Book(String bookCode, String title, String publisherCode, String type, Float price, boolean paperback) {
         this.bookCode = bookCode;
@@ -32,8 +33,9 @@ public class Book {
         this.title = title;
         this.price = price;
         Location location1 = new Location(location, onHand);
-        this.location = new ArrayList<Location>();
+        this.location = new ArrayList<>();
         this.location.add(location1);
+
     }
 
     public String getBookCode() {
@@ -67,6 +69,15 @@ public class Book {
     public void addLocation(Location location1){
         location.add(location1);
     }
+
+    public void setAuthor(Author author){
+        this.author = author;
+    }
+
+    public Author getAuthor(){
+        return author;
+    }
+
 
     public boolean equals(Object object){
         Book book = (Book)object;

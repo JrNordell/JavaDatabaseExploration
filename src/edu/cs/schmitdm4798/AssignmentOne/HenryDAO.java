@@ -22,6 +22,7 @@ public class HenryDAO {
     private Connection connection = null;
     private Statement statement = null;
     private ResultSet resultSet = null;
+    private boolean isConnected;
 
 
     public HenryDAO(){
@@ -34,7 +35,7 @@ public class HenryDAO {
         try{
                 //Open the connection to the database
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
-
+            isConnected = true;
                 //TESTING
 
 //            String sql = "SELECT * FROM mlb_team";
@@ -48,6 +49,7 @@ public class HenryDAO {
 
         }catch(SQLException ex){
             ex.printStackTrace();
+            isConnected = false;
         }
 
     }
@@ -69,9 +71,7 @@ public class HenryDAO {
 
                 authorList.add(author);
 
-
             }
-
 
         }catch (SQLException ex){
             ex.printStackTrace();
@@ -81,14 +81,14 @@ public class HenryDAO {
         return authorList;
     }
 
-    public Author getBookData(Author author){
+    public Author getAuthorBookData(Author author){
 
         String firstName = author.getFirst();
         String lastName = author.getLast();
 
         firstName = firstName.replace("'","''");
         lastName = lastName.replace("'","''");
-        String sql = "SELECT * FROM henry_book INNER JOIN henry_wrote on henry_book.book_code = henry_wrote.book_code " +
+        String sql = "SELECT book_code, title, price, branch_name, on_hand FROM henry_book INNER JOIN henry_wrote on henry_book.book_code = henry_wrote.book_code " +
                 "INNER JOIN henry_inventory ON henry_book.book_code = henry_inventory.book_code " +
                 "INNER JOIN henry_branch ON henry_inventory.branch_num = henry_branch.branch_num " +
                 "INNER JOIN henry_author ON henry_author.author_num = henry_wrote.author_num" +
@@ -120,6 +120,76 @@ public class HenryDAO {
 
 
         return author;
+    }
+
+    public List<Book> getCategoryBookData(String type){
+
+        String sql = "SELECT author_first, author_last, book_code, title, price, branch_name, on_hand FROM henry_book INNER JOIN henry_wrote on henry_book.book_code = henry_wrote.book_code " +
+        "INNER JOIN henry_inventory ON henry_book.book_code = henry_inventory.book_code " +
+                "INNER JOIN henry_branch ON henry_inventory.branch_num = henry_branch.branch_num " +
+                "INNER JOIN henry_author ON henry_author.author_num = henry_wrote.author_num" +
+                " WHERE type = '" + type + "' order by title";
+
+
+        List<Book>  bookList = new ArrayList<>();
+
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+
+            while(resultSet.next()){
+
+                String authorFirst = resultSet.getString("author_first");
+                String authorLast = resultSet.getString("author_last");
+
+                Author author = new Author(authorFirst, authorLast);
+
+                String bookCode = resultSet.getString("book_code");
+                String title = resultSet.getString("title");
+                Float price = resultSet.getFloat("price");
+                String location = resultSet.getString("branch_name");
+                int onHand = resultSet.getInt("on_hand");
+
+                Book book = new Book(bookCode,title,price,location,onHand);
+
+                author.addBook(book);
+
+                boolean isDone = false;
+                int i = 0;
+
+                if(bookList.size() != 0){
+
+
+                    while(!(isDone || bookList.size() <= i)){
+
+                        if(bookList.get(i).equals(book)){
+
+                            bookList.get(i).addLocation(book.getLocation().get(0));
+                            isDone = true;
+
+                        }else{
+
+                            ++i;
+                        }
+                    }
+
+                    if(i == bookList.size()){
+
+                        bookList.add(book);
+                    }
+                }else{
+
+                    bookList.add(book);
+                }
+
+
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+        System.out.println(bookList.size());
+        return bookList;
     }
 
     //retrieves the list of category abbreviations in alphabetical order
@@ -162,6 +232,13 @@ public class HenryDAO {
         }
         return publisherName;
     }
+
+
+    public boolean getIsConnected(){
+        return isConnected;
+    }
+
+
     public static void main(String[] args) {
         new HenryDAO();
     }

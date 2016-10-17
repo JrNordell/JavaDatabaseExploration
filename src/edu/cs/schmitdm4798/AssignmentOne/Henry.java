@@ -25,12 +25,23 @@ public class Henry {
 
         HenryDAO dao = new HenryDAO();
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Search by Author", new SearchByAuthorPanel(dao));
-        tabbedPane.addTab("Search by Category", new SearchByCategoryPanel(dao));
-        tabbedPane.addTab("Search by Publisher", new SearchByPublisherPanel(dao));
 
-        frame.add(tabbedPane);
+        if (dao.getIsConnected()){
+            JTabbedPane tabbedPane = new JTabbedPane();
+            tabbedPane.addTab("Search by Author", new SearchByAuthorPanel(dao));
+            tabbedPane.addTab("Search by Category", new SearchByCategoryPanel(dao));
+            tabbedPane.addTab("Search by Publisher", new SearchByPublisherPanel(dao));
+
+            frame.add(tabbedPane);
+        }else{
+            JLabel notConnected = new JLabel();
+            notConnected.setFont(new Font(notConnected.getFont().getName(), notConnected.getFont().getStyle(), 20));
+            notConnected.setText("Sorry, you are not connected to the server.");
+
+            frame.add(notConnected);
+
+        }
+
 
 
         frame.setVisible(true);

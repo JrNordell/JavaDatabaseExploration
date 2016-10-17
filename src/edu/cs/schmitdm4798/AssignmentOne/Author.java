@@ -48,12 +48,19 @@ public class Author {
             }
 
             if(i == bookList.size()){
+                book.setAuthor(this);
                 bookList.add(book);
             }
         }else{
+            book.setAuthor(this);
             bookList.add(book);
         }
 
+    }
+
+    public boolean equals(Object o){
+        Author author = (Author)o;
+        return (first.equals(author.first))&&(last.equals(author.last));
     }
 
     public List<Book> getBookList(){
