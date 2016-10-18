@@ -8,7 +8,7 @@ import java.awt.*;
 /**
  * Created by Dave and Jack.
  *
- * The Goal of this class is to set up the GUI for the program
+ * The Goal of this class is to set up the GUI for the thing
  *
  */
 public class Henry {
