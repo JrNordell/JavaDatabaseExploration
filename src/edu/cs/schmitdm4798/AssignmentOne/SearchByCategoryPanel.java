@@ -16,20 +16,20 @@ public class SearchByCategoryPanel extends JPanel {
 
     private HenryDAO dao;
 
+    private static final Color BACKGROUND_COLOR = new Color(100,255,218);
+
     private JComboBox<Book> comboBoxBook;
-    private String type;
     private List<Book> bookList;
     private JTextPane authorText;
+    private JTextPane price;
     private JPanel locationPanel;
     private boolean isSetUp;
 
     public SearchByCategoryPanel(HenryDAO dao){
         this.dao = dao;
-        Color color = new Color(46,125,50);
         isSetUp = false;
 
         List<String> categoryList = dao.getCategoryList();
-        type = categoryList.get(0);
 
         //Adds the distinct list of category abbreviations to the box
         JComboBox<String> comboBoxCat = new JComboBox<>(new Vector<>(categoryList));
@@ -63,12 +63,15 @@ public class SearchByCategoryPanel extends JPanel {
         authorText.setEditable(false);
         this.add(authorText);
 
+        price = new JTextPane();
+        price.setEditable(false);
+        this.add(price);
 
 
 
         setDefault();
         isSetUp = true;
-        this.setBackground(color);
+        this.setBackground(BACKGROUND_COLOR);
     }
 
     private void setDefault(){
@@ -80,6 +83,8 @@ public class SearchByCategoryPanel extends JPanel {
     }
 
     private void setBookInfo(Book book){
+
+        price.setText("$ " + book.getPrice().toString());
 
         if(isSetUp){
             this.remove(locationPanel);

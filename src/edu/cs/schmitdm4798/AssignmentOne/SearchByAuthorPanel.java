@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class SearchByAuthorPanel extends JPanel {
 
+    private static final Color BACKGROUND_COLOR = new Color(33,150,243);
+
     private HenryDAO dao;
     private Author author;
 
@@ -26,7 +28,7 @@ public class SearchByAuthorPanel extends JPanel {
 
     public  SearchByAuthorPanel(HenryDAO dao){
         this.dao = dao;
-        Color color = new Color(63,81,181);
+
 
         author = null;
         comboBoxBook = null;
@@ -86,7 +88,7 @@ public class SearchByAuthorPanel extends JPanel {
         setDefault();
         isSetUp = true;
 
-        this.setBackground(color);
+        this.setBackground(BACKGROUND_COLOR);
 
     }
         //sets the default book, price and location panel for when an author is picked

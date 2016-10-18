@@ -88,11 +88,13 @@ public class HenryDAO {
 
         firstName = firstName.replace("'","''");
         lastName = lastName.replace("'","''");
-        String sql = "SELECT book_code, title, price, branch_name, on_hand FROM henry_book INNER JOIN henry_wrote on henry_book.book_code = henry_wrote.book_code " +
+        String sql = "SELECT author_first, author_last, book_code, title, price, branch_name, on_hand FROM henry_book INNER JOIN henry_wrote on henry_book.book_code = henry_wrote.book_code " +
                 "INNER JOIN henry_inventory ON henry_book.book_code = henry_inventory.book_code " +
                 "INNER JOIN henry_branch ON henry_inventory.branch_num = henry_branch.branch_num " +
                 "INNER JOIN henry_author ON henry_author.author_num = henry_wrote.author_num" +
                 " WHERE author_first = '"+firstName+"' AND author_last = '"+lastName+"'";
+
+        System.out.println(sql);
 
 
 
@@ -121,6 +123,86 @@ public class HenryDAO {
 
         return author;
     }
+
+    public List<Book> getPublisherBookData(String publisher){
+
+        System.out.println(publisher);
+        String sql = "SELECT author_first, author_last, book_code, title, price, branch_name, on_hand\n" +
+                "FROM henry_book INNER JOIN henry_wrote \n" +
+                "  ON henry_book.book_code = henry_wrote.book_code \n" +
+                "  INNER JOIN henry_inventory\n" +
+                "  ON henry_book.book_code = henry_inventory.book_code \n" +
+                "  INNER JOIN henry_branch \n" +
+                "  ON henry_inventory.branch_num = henry_branch.branch_num \n" +
+                "  INNER JOIN henry_author \n" +
+                "  ON henry_author.author_num = henry_wrote.author_num\n" +
+                "  INNER JOIN henry_publisher\n" +
+                "  ON henry_book.PUBLISHER_CODE = henry_publisher.publisher_code\n" +
+                "  WHERE publisher_name = '"+publisher+"'";
+
+
+        List<Book>  bookList = new ArrayList<>();
+
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+
+            while(resultSet.next()){
+
+                String authorFirst = resultSet.getString("author_first").trim();
+                String authorLast = resultSet.getString("author_last").trim();
+
+                Author author = new Author(authorFirst, authorLast);
+
+                String bookCode = resultSet.getString("book_code");
+                String title = resultSet.getString("title");
+                Float price = resultSet.getFloat("price");
+                String location = resultSet.getString("branch_name");
+                int onHand = resultSet.getInt("on_hand");
+
+                Book book = new Book(bookCode,title,price,location,onHand);
+
+                author.addBook(book);
+
+
+                boolean isDone = false;
+                int i = 0;
+
+                if(bookList.size() != 0){
+
+
+                    while(!(isDone || bookList.size() <= i)){
+
+                        if(bookList.get(i).equals(book)){
+
+                            bookList.get(i).addLocation(book.getLocation().get(0));
+                            isDone = true;
+
+                        }else{
+
+                            ++i;
+                        }
+                    }
+
+                    if(i == bookList.size()){
+
+                        bookList.add(book);
+                    }
+                }else{
+
+                    bookList.add(book);
+                }
+
+
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+        System.out.println(bookList.size());
+        return bookList;
+    }
+
 
     public List<Book> getCategoryBookData(String type){
 
@@ -215,8 +297,9 @@ public class HenryDAO {
     //Retrieves the list of publisher names in alphabetical order
     public List<String> getPublisherList(){
 
-        String sql = "SELECT publisher_name\n" +
-                "FROM henry_publisher " +
+        String sql = "SELECT distinct publisher_name " +
+                "FROM henry_publisher INNER JOIN HENRY_BOOK " +
+                "ON henry_publisher.PUBLISHER_CODE = HENRY_BOOK.PUBLISHER_CODE " +
                 "ORDER BY publisher_name";
 
         List<String> publisherName = new ArrayList<>();
@@ -226,13 +309,14 @@ public class HenryDAO {
 
             while(resultSet.next()){
 
-                publisherName.add(resultSet.getString("publisher_name"));
+                publisherName.add(resultSet.getString("publisher_name").trim());
             }
         }catch (SQLException ex){
             ex.printStackTrace();
         }
         return publisherName;
     }
+
 
 
     public boolean getIsConnected(){
